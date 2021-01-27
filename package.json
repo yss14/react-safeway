@@ -1,0 +1,19 @@
+{
+  "name": "react-safeway",
+  "version": "1.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yss14/react-safeway.git"
+  },
+  "author": "Yannick Stachelscheid",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yss14/react-safeway/issues"
+  },
+  "homepage": "https://github.com/yss14/react-safeway#readme"
+}
