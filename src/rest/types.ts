@@ -9,10 +9,10 @@ export interface RESTRequest<TData, TPayload> {
 
 interface TypedRESTOperation<TData, TVar> {
 	method: HTTPMethod
-	url: string | ((variables: TVar) => string)
+	url: string | ((...args: [TVar]) => string)
 }
 
-export interface TypedRESTQuery<TData, TVar> extends TypedRESTOperation<TData, TVar> {
+export interface TypedRESTQuery<TData, TVar = void> extends TypedRESTOperation<TData, TVar> {
 	key: QueryKey | ((variables: TVar) => QueryKey)
 }
 
@@ -24,12 +24,15 @@ export interface TypedRESTMutation<TData, TVar, TPayload> extends TypedRESTOpera
 
 // TODO move those constructor functions to separate files
 export type TypedRESTQueryArgs<TData, TVar> = Omit<TypedRESTQuery<TData, TVar>, "method">
-export const RESTQuery = <TData, TVar>({ key, url }: TypedRESTQueryArgs<TData, TVar>): TypedRESTQuery<TData, TVar> => ({
+export const RESTQuery = <TData, TVar = void>({
+	key,
+	url,
+}: TypedRESTQueryArgs<TData, TVar>): TypedRESTQuery<TData, TVar> => ({
 	method: "GET",
 	key,
 	url,
 })
 
-export const RESTMutation = <TData, TVar, TPayload = TVar>(
+export const RESTMutation = <TData, TVar = void, TPayload = TVar>(
 	operation: TypedRESTMutation<TData, TVar, TPayload>,
 ): TypedRESTMutation<TData, TVar, TPayload> => operation

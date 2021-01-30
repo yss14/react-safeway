@@ -24,16 +24,20 @@ export const useRESTQuery = <TData, TVar>(
 	const cachingKey = typeof key === "function" ? key(variables) : key
 	const finalUrl = typeof url === "function" ? url(variables) : url
 
-	const queryObject = useQuery<TData, unknown, TVar>(cachingKey, async () => {
-		if (resolver) {
-			return resolver({})
-		} else {
-			return restClient.request<TData, void>({
-				method,
-				url: finalUrl,
-			})
-		}
-	})
+	const queryObject = useQuery<TData, unknown, TData>(
+		cachingKey,
+		async () => {
+			if (resolver) {
+				return resolver({})
+			} else {
+				return restClient.request<TData, void>({
+					method,
+					url: finalUrl,
+				})
+			}
+		},
+		opts,
+	)
 
 	return queryObject
 }

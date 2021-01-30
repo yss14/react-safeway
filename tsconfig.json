@@ -22,7 +22,8 @@
 		"noImplicitAny": true,
 		"skipLibCheck": true,
 		"strictNullChecks": true,
-		"suppressImplicitAnyIndexErrors": true
+		"suppressImplicitAnyIndexErrors": true,
+		"jsx": "react-jsx"
 	},
 	"include": ["src"],
 	"compileOnSave": true

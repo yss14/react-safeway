@@ -2,7 +2,7 @@ import { DocumentNode } from "graphql"
 import { useQuery, UseQueryOptions } from "react-query"
 import { GraphQLClient } from "./GraphQLClient"
 import { useGraphQLClient } from "./GraphQLClientContext"
-import { TypedGraphQLOperation } from "./types"
+import { BaseGraphQLResolverArgs, TypedGraphQLOperation } from "./types"
 
 const getQueryKey = (query: DocumentNode): string => {
 	// TODO resolve any type
@@ -13,12 +13,7 @@ interface GraphQLVariables<TVar> {
 	variables?: TVar
 }
 
-export interface BaseResolverArgs<TVar> {
-	variables: TVar
-	client: GraphQLClient
-}
-
-export interface QueryResolverArgs<TVar> extends BaseResolverArgs<TVar> {
+export interface QueryResolverArgs<TVar> extends BaseGraphQLResolverArgs<TVar> {
 	query: DocumentNode
 }
 

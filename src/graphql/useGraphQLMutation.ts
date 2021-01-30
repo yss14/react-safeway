@@ -2,18 +2,13 @@ import { DocumentNode } from "graphql"
 import { useMutation, UseMutationOptions } from "react-query"
 import { GraphQLClient } from "./GraphQLClient"
 import { useGraphQLClient } from "./GraphQLClientContext"
-import { TypedGraphQLOperation } from "./types"
+import { BaseGraphQLResolverArgs, TypedGraphQLOperation } from "./types"
 
 interface GraphQLVariables<TVar> {
 	variables?: TVar
 }
 
-export interface BaseResolverArgs<TVar> {
-	variables: TVar
-	client: GraphQLClient
-}
-
-export interface MutationResolverArgs<TVar> extends BaseResolverArgs<TVar> {
+export interface MutationResolverArgs<TVar> extends BaseGraphQLResolverArgs<TVar> {
 	mutation: DocumentNode
 }
 
