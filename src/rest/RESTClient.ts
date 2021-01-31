@@ -12,7 +12,7 @@ export const RESTClient = (httpClient: HTTPClient) => {
 				data: payload,
 			})
 
-			if (response.status >= 200 && response.status <= 204 && response.data) {
+			if (response.statusCode >= 200 && response.statusCode <= 204 && response.data) {
 				return response.data
 			} else {
 				// TODO error handling

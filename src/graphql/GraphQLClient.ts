@@ -26,7 +26,7 @@ export const GraphQLClient = (httpClient: HTTPClient) => {
 				data: body,
 			})
 
-			if (response.status >= 200 && response.status <= 204 && response.data.data) {
+			if (response.statusCode >= 200 && response.statusCode <= 204 && response.data.data) {
 				return response.data.data
 			} else {
 				// TODO error handling
