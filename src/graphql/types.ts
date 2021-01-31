@@ -6,6 +6,13 @@ export interface TypedGraphQLOperation<TData, TVar> {
 	variables?: TVar
 }
 
+export type TypedGraphQLQuery<TData, TVar> = TypedGraphQLOperation<TData, TVar>
+
+export interface TypedGraphQLMutation<TData, TVar> {
+	mutation: DocumentNode
+	variables?: TVar
+}
+
 export interface BaseGraphQLResolverArgs<TVar> {
 	variables: TVar
 	client: GraphQLClient

@@ -8,7 +8,7 @@ export const useRESTQueryClient = () => {
 	const queryClient = useContext(RESTQueryClientContext)
 
 	if (!queryClient) {
-		throw new Error("useSafewayQueryClient hook can only be used within the scope of a SafewayQueryClientContext")
+		throw new Error("useRESTQueryClient hook can only be used within the scope of a RESTQueryClientProvider")
 	}
 
 	return queryClient

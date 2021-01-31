@@ -1,6 +1,5 @@
 import { DocumentNode } from "graphql"
 import { useQuery, UseQueryOptions } from "react-query"
-import { GraphQLClient } from "./GraphQLClient"
 import { useGraphQLClient } from "./GraphQLClientContext"
 import { BaseGraphQLResolverArgs, TypedGraphQLOperation } from "./types"
 
@@ -21,19 +20,14 @@ export type GraphQLQueryOpts<T> = T extends TypedGraphQLOperation<infer TData, i
 	? UseGraphQLQueryOptions<TData, TVar>
 	: never
 
-export interface UseGraphQLQueryOptions<TData, TVar = {}> extends UseQueryOptions<TData>, GraphQLVariables<TVar> {
+export interface UseGraphQLQueryOptions<TData, TVar> extends UseQueryOptions<TData>, GraphQLVariables<TVar> {
 	operatioName?: string
 	resolver?: (args: QueryResolverArgs<TVar>) => TData | Promise<TData>
 }
 
-export const useGraphQLQuery = <TData, TVar extends {} = {}>(
+export const useGraphQLQuery = <TData, TVar>(
 	{ query }: TypedGraphQLOperation<TData, TVar>,
-	{
-		variables = {} as TVar,
-		operatioName = getQueryKey(query),
-		resolver,
-		...opts
-	}: UseGraphQLQueryOptions<TData, TVar> = {},
+	{ variables, operatioName = getQueryKey(query), resolver, ...opts }: UseGraphQLQueryOptions<TData, TVar> = {},
 ) => {
 	const graphQLClient = useGraphQLClient()
 
@@ -43,7 +37,7 @@ export const useGraphQLQuery = <TData, TVar extends {} = {}>(
 		cachingKey,
 		async () => {
 			if (resolver) {
-				return resolver({ query, client: graphQLClient, variables })
+				return resolver({ query, client: graphQLClient, variables: variables! }) // TODO resolve optinal TVar property passed to resolver
 			} else {
 				return graphQLClient.request<TData, TVar>({ query, variables })
 			}
