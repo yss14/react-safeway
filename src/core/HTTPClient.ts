@@ -9,6 +9,9 @@ export interface HTTPRequest<TPayload, TResponse> {
 	__responseType?: TResponse
 }
 
+// for now the HTTPClient is realized via axios
+// TODO: add abstraction layer for http requests, enabling different HTTPClient implementations
+
 export type HTTPClient = ReturnType<typeof HTTPClient>
 
 export const HTTPClient = (axiosClient: AxiosInstance) => {

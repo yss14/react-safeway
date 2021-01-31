@@ -22,8 +22,8 @@ What is the value add of `react-safeway`?
     	completed: boolean
     }
 
+    // only one location where generics for data and variables must be stated
     export const POSTS_QUERY = RESTQuery<Post[]>({
-    	// only one location where the generics for data and variables must be stated
     	url: "/posts",
     	key: "posts",
     })
@@ -243,7 +243,38 @@ export const useUpdateOrganizationName = (opts?: RESTMutationOpts<typeof UPDATE_
 
 ### Transformed Queries and Mutations
 
-// TODO
+Since especially for GraphQL queries and mutations data is often encapsulated into a deep nested object strcture due to the natur of the GraphQL language, it can be tedious to access this desired data. Transformed quries and mutations help to avoid this repetitive nested object access.
+
+```typescript
+interface SongQueryData {
+	share: {
+		song: Required<ShareSong>
+	}
+}
+
+interface SongQueryVariables {
+	shareID: string
+	songID: string
+}
+
+// now our SONG_QUERY returns the song directly and automatically inferes its type
+const SONG_QUERY = Transform(
+	GraphQLQuery<SongQueryData, SongQueryVariables>(gql`
+	query song ($shareID: String!, $songID: String!){
+		share(shareID: $shareID) {
+			id,
+      		song(id: $songID){
+				id
+                title
+                artists
+                ...
+			}
+    	}
+  	}
+`),
+	(response) => response.share.song,
+)
+```
 
 ### Error Handling
 

@@ -1,5 +1,5 @@
 import { useMutation } from "react-query"
-import { RESTMutation, RESTQuery } from "rest/types"
+import { RESTMutation, RESTQuery, TypedRESTQuery } from "rest/types"
 import { RESTQueryOpts, useRESTQuery } from "rest/useRESTQuery"
 
 interface Organization {
@@ -22,13 +22,25 @@ interface OrganizationJobsVariables {
 	organizationID: number
 }
 
-const ORGANIZATION_JOBS_QUERY = RESTQuery<Job[], OrganizationJobsVariables>({
-	key: ({ organizationID }) => ["organizations", organizationID, "jobs"],
-	url: ({ organizationID }) => `/organizations/${organizationID}/jobs`,
+const Transform = <TDataTransformed, TData, TVar>(
+	query: TypedRESTQuery<TData, TVar>,
+	transformFn: (data: TData) => TDataTransformed,
+): TypedRESTQuery<TDataTransformed, TVar> => ({
+	...query,
 })
 
+const ORGANIZATION_JOBS_QUERY = Transform(
+	RESTQuery<Job[], OrganizationJobsVariables>({
+		key: ({ organizationID }) => ["organizations", organizationID, "jobs"],
+		url: ({ organizationID }) => `/organizations/${organizationID}/jobs`,
+	}),
+	(data) => data.map((job) => job.id),
+)
+
 const useOrganizations = (opts?: RESTQueryOpts<typeof ORGANIZATION_JOBS_QUERY>) => {
-	return useRESTQuery(ORGANIZATION_JOBS_QUERY, opts)
+	return useRESTQuery(ORGANIZATION_JOBS_QUERY, {
+		onSuccess: (data) => {},
+	})
 }
 
 interface UpdateOrganizationTierPayload {
