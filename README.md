@@ -2,7 +2,7 @@
 
 An opionated typesafe `react-query` extension for both REST and GraphQL queries and mutations.
 
-** Currently this library is only a proposal and is under heavy development **
+**Currently this library is only a proposal and is under heavy development**
 
 ## Proposal
 
@@ -160,23 +160,112 @@ const UPDATE_ORGANIZATION_NAME = RESTMutation<
 
 ### `GraphQLQuery` and `GraphQLMutation`
 
+The same principle as for the REST equivalent applies to the GraphQL part, excep the difference of passing a GraphQL document instead of an url, since for most GraphQL endpoints all queries and mutations are realized as a `POST` request to a fixed url.
+
+```typescript
+interface SongQueryData {
+	share: {
+		song: Required<ShareSong>
+	}
+}
+
+interface SongQueryVariables {
+	shareID: string
+	songID: string
+}
+
+const SONG_QUERY = GraphQLQuery<SongQueryData, SongQueryVariables>(gql`
+	query song ($shareID: String!, $songID: String!){
+		share(shareID: $shareID) {
+			id,
+      		song(id: $songID){
+				id
+                title
+                artists
+                ...
+			}
+    	}
+  	}
+`)
+
+// Same principle applies to GraphQLMutation!
+```
+
 ### Typesafe `QueryClient`
 
-### Package Distribution
+Since `react-query@3` we have to manually created our own `QueryClient` instance and provide access via the `QueryClientProvider`.
+
+The same would apply to `react-safeway`! We provide an extended version of the `QueryClient`, named `RESTQueryClient` / `GraphQLQueryClient`, both providing typesafe access to methods like `getQueryData`, `setQueryData`, etc...
+
+```typescript
+// App.tsx
+
+const App = () => {
+	const restClient = useMemo(() => RESTClient(
+		AxiosHTTPClient(
+			axios.create({
+				baseURL: "<url>",
+			}),
+		),
+	), [])
+
+    const restQueryClient = useMemo(() => new RESTQueryClient())
+
+    return (
+        <RESTClientProvider client={restClient}>
+            <RESTQueryClientProvider vlient={restQueryClient}>
+                <MyApp />
+            </RESTQueryClientProvider>
+        <RESTClientProvider/>
+    )
+}
+
+// useUpdateOrganizationName.ts
+
+export const useUpdateOrganizationName = (opts?: RESTMutationOpts<typeof UPDATE_ORGANIZATION_NAME>) => {
+	const queryClient = useRESTQueryClient() // gives access to the typesafe REST query client extension
+
+	return useRESTMutation(UPDATE_ORGANIZATION_NAME, {
+		...opts,
+		onSuccess: (data, vars, context) => {
+			queryClient.setTypedQueryData(
+				ORGANIZATION_QUERY,
+                {organizationID: vars.organizationID},
+                // we are forced to provide the correct data here, since setTypedQueryData inferes the required data type of the query
+				(organization) => ({...organization, name: data.name}),
+			)
+
+			opts?.onSuccess && opts.onSuccess(data, vars, context)
+		},
+	})
+}
+```
+
+### Transformed Queries and Mutations
+
+// TODO
+
+### Error Handling
+
+// TODO
+
+## Package Distribution
 
 Since the GraphQL and REST client parts required different underlying (peer) dependencies, the idea would be to split `react-safeway` into 3 packages.
 
-#### `@react-safeway/core`
+Furthermore, we would commit to always keep `react-safeway` update-to-date with the latest `react-query` version.
+
+### `@react-safeway/core`
 
 Provides the shared core logic which both parts depend on, like `HTTPClient`.
 
-#### `@react-safeway/rest`
+### `@react-safeway/rest`
 
 Contains all REST related logic and APIs, like `RESTClient`, `useRESTQuery`, `useRESTMutation`, etc...
 
 Depends on `@react-safeway/core`.
 
-#### `@react-safeway/graphql`
+### `@react-safeway/graphql`
 
 Contains all GraphQL related logic and APIs, like `GraphQLClient`, `useGraphQLQuery`, `useGraphQLMutation`, etc...
 
