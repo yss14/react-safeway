@@ -1,12 +1,14 @@
 import { GraphQLError, print } from "graphql"
 import { HTTPClient } from "../core/HTTPClient"
+import { HTTPError } from "../core/HTTPError"
+import { GraphQLClientError } from "./GraphQLClientError"
 import { TypedGraphQLOperation } from "./types"
 
 export interface GraphQLResponse<TData> {
 	data?: TData
 	errors?: GraphQLError[]
 	extensions?: any
-	status: number
+	status?: number
 	[key: string]: any
 }
 
@@ -26,14 +28,32 @@ export const GraphQLClient = (httpClient: HTTPClient) => {
 				data: body,
 			})
 
-			if (response.statusCode >= 200 && response.statusCode <= 204 && response.data.data) {
+			if (response.status >= 200 && response.status <= 204 && response.data.data) {
 				return response.data.data
 			} else {
-				// TODO error handling
-				throw new Error("Wrong status code returned")
+				throw new GraphQLClientError<TData, TVar>(
+					{
+						...response.data,
+					},
+					{
+						query: printedQuery,
+						variables: variables ? variables : undefined,
+					},
+				)
 			}
 		} catch (err) {
-			// TODO error handling
+			if (err instanceof HTTPError) {
+				throw new GraphQLClientError<TData, TVar>(
+					{
+						...err,
+					},
+					{
+						query: printedQuery,
+						variables: variables ? variables : undefined,
+					},
+				)
+			}
+
 			throw err
 		}
 	}
