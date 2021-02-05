@@ -1,6 +1,8 @@
 import { useMutation } from "react-query"
 import { RESTMutation, RESTQuery, TypedRESTQuery } from "rest/types"
 import { RESTQueryOpts, useRESTQuery } from "rest/useRESTQuery"
+import { TypedQuery } from "./core/TypedQuery"
+import { useTypedQuery } from "./core/useTypedQuery"
 
 interface Organization {
 	id: number
@@ -52,3 +54,13 @@ const UPDATE_ORGANIZATION_TIER = RESTMutation<Organization, UpdateOrganizationTi
 	method: "PATCH",
 	url: ({ organizationID }) => `/organizations/${organizationID}/tier`,
 })
+
+const NEW_TYPED_QUERY = TypedQuery<string, undefined>({
+	key: (args) => "organization",
+})
+
+type NewTypedQueryOpts = RESTQueryOpts<typeof NEW_TYPED_QUERY>
+
+export const useMyTypedQuery = () => {
+	return useTypedQuery(NEW_TYPED_QUERY, async () => "Yolo")
+}
