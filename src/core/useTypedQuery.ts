@@ -4,15 +4,17 @@ import { TypedQuery } from "./TypedQuery"
 
 export type UseTypedQueryQueryFn<TData> = () => Promise<TData>
 
-interface UseTypedQueryOptsWithoutVariables<TData> extends QueryOptions<TData, unknown, TData> {}
+export interface UseTypedQueryOptsWithoutVariables<TData> extends QueryOptions<TData, unknown, TData> {}
 
-interface UseTypedQueryOptsWithVariables<TData, TVar> extends QueryOptions<TData, unknown, TData> {
+export interface UseTypedQueryOptsWithVariables<TData, TVar> extends QueryOptions<TData, unknown, TData> {
 	variables: TVar
 }
 
 export type UseTypedQueryOpts<TData, TVar> =
 	| UseTypedQueryOptsWithVariables<TData, TVar>
 	| UseTypedQueryOptsWithoutVariables<TData>
+
+export type TypedQueryOpts<T> = T extends TypedQuery<infer TData, infer TVar> ? UseTypedQueryOpts<TData, TVar> : never
 
 const isArgsWithVariables = <TData, TVar>(
 	obj: UseTypedQueryOptsWithoutVariables<TData>,

@@ -2,7 +2,7 @@ import { useMutation } from "react-query"
 import { RESTMutation, RESTQuery, TypedRESTQuery } from "rest/types"
 import { RESTQueryOpts, useRESTQuery } from "rest/useRESTQuery"
 import { TypedQuery } from "./core/TypedQuery"
-import { useTypedQuery } from "./core/useTypedQuery"
+import { TypedQueryOpts, useTypedQuery } from "./core/useTypedQuery"
 
 interface Organization {
 	id: number
@@ -59,8 +59,8 @@ const NEW_TYPED_QUERY = TypedQuery<string, undefined>({
 	key: (args) => "organization",
 })
 
-type NewTypedQueryOpts = RESTQueryOpts<typeof NEW_TYPED_QUERY>
+type NewTypedQueryOpts = TypedQueryOpts<typeof NEW_TYPED_QUERY>
 
-export const useMyTypedQuery = () => {
-	return useTypedQuery(NEW_TYPED_QUERY, async () => "Yolo")
+export const useMyTypedQuery = (opts?: NewTypedQueryOpts) => {
+	return useTypedQuery(NEW_TYPED_QUERY, async () => "Yolo", opts)
 }

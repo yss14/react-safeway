@@ -1,4 +1,7 @@
 export * from "./core/HTTPClient"
+export * from "./core/HTTPError"
+export * from "./core/TypedQuery"
+export * from "./core/useTypedQuery"
 
 export * from "./graphql/types"
 export * from "./graphql/GraphQLClient"
