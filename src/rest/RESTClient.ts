@@ -4,7 +4,7 @@ import { RESTRequest } from "./types"
 export type RESTClient = ReturnType<typeof RESTClient>
 
 export const RESTClient = (httpClient: HTTPClient) => {
-	const request = async <TData, TPayload>({ method, url, payload }: RESTRequest<TData, TPayload>) => {
+	const request = async <TData, TPayload>({ method, url, payload }: RESTRequest<TPayload>) => {
 		try {
 			console.log({ payload })
 			const response = await httpClient.request<TPayload, TData>({

@@ -42,6 +42,8 @@ const ORGANIZATION_JOBS_QUERY = Transform(
 const useOrganizations = (opts?: RESTQueryOpts<typeof ORGANIZATION_JOBS_QUERY>) => {
 	return useRESTQuery(ORGANIZATION_JOBS_QUERY, {
 		onSuccess: (data) => {},
+		variables: { organizationID: 2 },
+		...opts,
 	})
 }
 
@@ -55,12 +57,12 @@ const UPDATE_ORGANIZATION_TIER = RESTMutation<Organization, UpdateOrganizationTi
 	url: ({ organizationID }) => `/organizations/${organizationID}/tier`,
 })
 
-const NEW_TYPED_QUERY = TypedQuery<string, undefined>({
+const NEW_TYPED_QUERY = TypedQuery<string>({
 	key: (args) => "organization",
 })
 
 type NewTypedQueryOpts = TypedQueryOpts<typeof NEW_TYPED_QUERY>
 
 export const useMyTypedQuery = (opts?: NewTypedQueryOpts) => {
-	return useTypedQuery(NEW_TYPED_QUERY, async () => "Yolo", opts)
+	return useTypedQuery(NEW_TYPED_QUERY, async () => "Yolo")
 }

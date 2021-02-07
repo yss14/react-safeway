@@ -1,24 +1,24 @@
 import { HTTPMethod } from "core/HTTPClient"
 import { QueryKey } from "react-query"
 
-export interface RESTRequest<TData, TPayload> {
+export interface RESTRequest<TPayload> {
 	method: HTTPMethod
-	url: string
+	url?: string
 	payload?: TPayload
 }
 
-interface TypedRESTOperation<TData, TVar> {
+interface TypedRESTOperation<TVar> {
 	method: HTTPMethod
-	url: string | ((...args: [TVar]) => string)
+	url?: string | ((variables: TVar) => string)
 }
 
-export interface TypedRESTQuery<TData, TVar = void> extends TypedRESTOperation<TData, TVar> {
+export interface TypedRESTQuery<TData, TVar = void> extends TypedRESTOperation<TVar> {
 	key: QueryKey | ((variables: TVar) => QueryKey)
 }
 
 export type NotAFunction<T> = T extends Function ? never : T
 
-export interface TypedRESTMutation<TData, TVar, TPayload> extends TypedRESTOperation<TData, TVar> {
+export interface TypedRESTMutation<TData, TVar, TPayload> extends TypedRESTOperation<TVar> {
 	payload?: (variables: TVar) => TPayload extends void ? never : TPayload
 }
 
