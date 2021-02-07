@@ -1,41 +1,60 @@
-import { useMutation, UseMutationOptions } from "react-query"
+import { useMutation, UseMutationOptions, UseMutationResult } from "react-query"
+import { HTTPMethod } from "../core/HTTPClient"
 import { useRESTClient } from "./RESTClientContext"
-import { TypedRESTMutation } from "./types"
 
-export type RESTMutationOpts<T> = T extends TypedRESTMutation<infer TData, infer TVar, infer TPayload>
-	? UseRESTMutationOptions<TData, TVar, TPayload>
-	: never
-
-interface RESTVariables<TVar> {
-	variables?: TVar
+interface UseRESTMutationOptionsBase {
+	method: HTTPMethod
 }
 
-interface UseRESTMutationOptions<TData, TVar, TPayload>
-	extends UseMutationOptions<TData, unknown, TVar>,
-		RESTVariables<TVar> {
-	resolver?: (args: any) => TData | Promise<TData> // TODO typing
+export interface UseRESTMutationOptionsWithoutVariables<TData>
+	extends UseRESTMutationOptionsBase,
+		UseMutationOptions<TData, unknown, undefined> {
+	url: string | (() => string)
+	resolver?: () => TData | Promise<TData>
 }
 
-export const useRESTMutation = <TData, TVar, TPayload>(
-	{ method, url, payload }: TypedRESTMutation<TData, TVar, TPayload>,
-	{ resolver, variables, ...opts }: UseRESTMutationOptions<TData, TVar, TPayload> = {},
-) => {
+export interface UseRESTMutationOptionsWithVariables<TData, TVar, TPayload>
+	extends UseRESTMutationOptionsBase,
+		UseMutationOptions<TData, unknown, TVar> {
+	url: string | ((variables: TVar) => string)
+	payload: (variables: TVar) => TPayload
+	resolver?: (variables: TVar) => TData | Promise<TData>
+}
+
+export type UseRESTMutationOptions<TData, TVar, TPayload> =
+	| UseRESTMutationOptionsWithoutVariables<TData>
+	| UseRESTMutationOptionsWithVariables<TData, TVar, TPayload>
+
+const isOptsWithVariables = <TData, TVar, TPayload>(
+	obj: any,
+): obj is UseRESTMutationOptionsWithVariables<TData, TVar, TPayload> =>
+	typeof (obj as UseRESTMutationOptionsWithVariables<TData, TVar, TPayload>).payload !== "undefined"
+
+export function useRESTMutation<TData>(
+	opts: UseRESTMutationOptionsWithoutVariables<TData>,
+): UseMutationResult<TData, unknown, undefined>
+export function useRESTMutation<TData, TVar, TPayload>(
+	opts: UseRESTMutationOptionsWithVariables<TData, TVar, TPayload>,
+): UseMutationResult<TData, unknown, TVar>
+export function useRESTMutation<TData, TVar, TPayload>(
+	opts: UseRESTMutationOptions<TData, TVar | undefined, TPayload | undefined>,
+) {
 	const restClient = useRESTClient()
 
 	const queryObject = useMutation<TData, unknown, TVar>(async (variables) => {
-		const finalUrl = typeof url === "function" ? url(variables || ({} as TVar)) : url
-		const finalPayload = typeof payload === "function" ? payload(variables || ({} as TVar)) : payload
+		const finalUrl = typeof opts.url === "function" ? opts.url(variables) : opts.url
+		const finalPayload = isOptsWithVariables<TData, TVar, TPayload>(opts) ? opts.payload(variables) : undefined
 
-		if (resolver) {
-			return resolver({})
+		if (opts.resolver) {
+			return opts.resolver(variables)
 		} else {
-			return restClient.request<TData, TPayload>({
-				method,
+			return restClient.request<TData, TPayload | TVar>({
+				method: opts.method, // TODO migh move to mutation definition?
 				url: finalUrl,
 				payload: finalPayload,
 			})
 		}
-	}, opts)
+	}, opts as any) // TODO add opts
 
 	return queryObject
 }

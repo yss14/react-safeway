@@ -1,5 +1,3 @@
-import { useMutation } from "react-query"
-import { RESTMutation, RESTQuery, TypedRESTQuery } from "rest/types"
 import { RESTQueryOpts, useRESTQuery } from "rest/useRESTQuery"
 import { TypedQuery } from "./core/TypedQuery"
 import { TypedQueryOpts, useTypedQuery } from "./core/useTypedQuery"
@@ -15,16 +13,15 @@ interface Job {
 	title: string
 }
 
-const ORGANIZATIONS_QUERY = RESTQuery<Organization[], void>({
+const ORGANIZATIONS_QUERY = TypedQuery<Organization[], void>({
 	key: "organizations",
-	url: "/organizations",
 })
 
 interface OrganizationJobsVariables {
 	organizationID: number
 }
 
-const Transform = <TDataTransformed, TData, TVar>(
+/*const Transform = <TDataTransformed, TData, TVar>(
 	query: TypedRESTQuery<TData, TVar>,
 	transformFn: (data: TData) => TDataTransformed,
 ): TypedRESTQuery<TDataTransformed, TVar> => ({
@@ -37,12 +34,16 @@ const ORGANIZATION_JOBS_QUERY = Transform(
 		url: ({ organizationID }) => `/organizations/${organizationID}/jobs`,
 	}),
 	(data) => data.map((job) => job.id),
-)
+)*/
+
+const ORGANIZATION_JOBS_QUERY = TypedQuery<Job[], OrganizationJobsVariables>({
+	key: ({ organizationID }) => [`organization`, organizationID, "jobs"],
+})
 
 const useOrganizations = (opts?: RESTQueryOpts<typeof ORGANIZATION_JOBS_QUERY>) => {
 	return useRESTQuery(ORGANIZATION_JOBS_QUERY, {
-		onSuccess: (data) => {},
-		variables: { organizationID: 2 },
+		variables: { organizationID: 32 },
+		url: "yolo",
 		...opts,
 	})
 }
