@@ -1,6 +1,8 @@
 import { RESTQueryOpts, useRESTQuery } from "rest/useRESTQuery"
 import { TypedQuery } from "./core/TypedQuery"
 import { TypedQueryOpts, useTypedQuery } from "./core/useTypedQuery"
+import { TypedRESTMutation } from "./rest/TypedRESTMutation"
+import { RESTMutationOpts, useRESTMutation } from "./rest/useRESTMutation"
 
 interface Organization {
 	id: number
@@ -53,10 +55,21 @@ interface UpdateOrganizationTierPayload {
 	tier: string
 }
 
-const UPDATE_ORGANIZATION_TIER = RESTMutation<Organization, UpdateOrganizationTierPayload, void>({
+const UPDATE_ORGANIZATION_TIER = TypedRESTMutation<
+	Organization,
+	UpdateOrganizationTierPayload,
+	Pick<UpdateOrganizationTierPayload, "tier">
+>({
 	method: "PATCH",
-	url: ({ organizationID }) => `/organizations/${organizationID}/tier`,
 })
+
+const useUpdateOrganizationTier = (opts?: RESTMutationOpts<typeof UPDATE_ORGANIZATION_TIER>) => {
+	return useRESTMutation(UPDATE_ORGANIZATION_TIER, {
+		url: ({ organizationID }) => `/organizations/${organizationID}/tier`,
+		payload: ({ tier }) => ({ tier }),
+		...opts,
+	})
+}
 
 const NEW_TYPED_QUERY = TypedQuery<string>({
 	key: (args) => "organization",

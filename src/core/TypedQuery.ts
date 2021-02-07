@@ -17,12 +17,6 @@ export type TypedQuery<TData, TVar> = TypedQueryWithoutVariables<TData> | TypedQ
 
 export type TypedQueryArgs<TData, TVar = undefined> = Pick<TypedQuery<TData, TVar>, "key">
 
-/*export const TypedQuery = <TData, TVar = undefined>(args: TypedQueryArgs<TData, TVar>): TypedQuery<TData, TVar> => ({
-	...args,
-	__dataType: {} as TData,
-	__varType: {} as TVar,
-})*/
-
 export function TypedQuery<TData>(args: TypedQueryArgs<TData>): TypedQueryWithoutVariables<TData>
 export function TypedQuery<TData, TVar>(args: TypedQueryArgs<TData, TVar>): TypedQueryWithVariables<TData, TVar>
 export function TypedQuery<TData, TVar>(args: TypedQueryArgs<TData, TVar>): TypedQuery<TData, TVar> {
